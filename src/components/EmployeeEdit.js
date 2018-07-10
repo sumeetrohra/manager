@@ -1,89 +1,110 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
+import { View, Text, Picker, Linking } from 'react-native';
 import { connect } from 'react-redux';
-import { text } from 'react-native-communications';
-import EmployeeForm from './EmployeeForm';
-import {
-    employeeUpdate,
-    employeeSave,
-    employeeDelete,
-} from '../actions';
-import { Card, CardSection, Button, Confirm } from './common';
+import { employeeSave, employeeDelete } from '../actions';
+import { Card, CardSection, Button, Input, Confirm } from './common';
 
 class EmployeeEdit extends Component {
-    state = { showModal: false }
+    state = { name: '', phone: '', shift: '', showModal: false }
 
     componentWillMount() {
-        _.forEach(this.props.employee, (value, prop) => {
-            this.props.employeeUpdate({ prop, value });
-        });
+        const { name, phone, shift } = this.props.employee;
+        this.setState({ name, phone, shift });
     }
 
     onButtonPress() {
-        const { name, phone, shift } = this.props;
-        this.props.employeeSave({ name, phone, shift, uid: this.props.employee.uid });
-    }
-
-    onTextPress() {
-        const { phone, shift } = this.props;
-        text(phone, `Your upcoming shift is on ${shift}`);
-    }
-
-    onAccept() {
-        const { uid } = this.props.employee;
-
-        this.props.employeeDelete({ uid });
-    }
-
-    onDecline() {
-        this.setState({ showModal: false });
+        const { name, phone, shift } = this.state;
+        this.props.employeeSave({ name, phone, shift, uid: this.props.employee.uid })
     }
 
     render() {
         return (
             <Card>
-                <EmployeeForm />
+              
                 <CardSection>
-                    <Button
-                    title="Save Changes"
-                    onPress={this.onButtonPress.bind(this)}
-                    />
-                </CardSection>
-
-
-                <CardSection>
-                    <Button
-                    title="Send Schedule"
-                    onPress={this.onTextPress.bind(this)}
-                    />
+                  <Input
+                    label="Name:"
+                    placeholder="Jane"
+                    value={this.state.name}
+                    onChangeText={text => this.setState({ name: text })}
+                  />
                 </CardSection>
 
                 <CardSection>
+                  <Input
+                    label="Phone No:"
+                    placeholder="9900990099"
+                    keyboardType={'phone-pad'}
+                    value={this.state.phone}
+                    onChangeText={text => this.setState({phone: text})}
+                  />
+                </CardSection>
+
+                <CardSection style={{ flexDirection: 'column' }}>
+                    <Text style={styles.pickerText}>
+                        Select A Shift
+                    </Text>
+                    <Picker
+                        selectedValue={this.state.shift}
+                        onValueChange={text => this.setState({shift: text})}
+			            style={{ marginLeft: 12, marginRight: 12 }}
+		            >
+
+            			<Picker.Item label="Monday" value="Monday" />
+                        <Picker.Item label="Tuesday" value="Tuesday" />
+                        <Picker.Item label="Wednesday" value="Wednesday" />
+                        <Picker.Item label="Thursday" value="Thursday" />
+                        <Picker.Item label="Friday" value="Friday" />
+                        <Picker.Item label="Saturday" value="Saturday" />
+			            <Picker.Item label="Sunday" value="Sunday" />
+
+                </Picker>
+                </CardSection>
+
+                <CardSection>
                     <Button
-                    title="Fire Employee"
-                    onPress={() => this.setState({ showModal: !this.state.showModal })}
+                      title="Save Changes"
+                        onPress={this.onButtonPress.bind(this)}
+                    />
+                </CardSection>
+
+                <CardSection>
+                    <Button
+                      title="Send Schedule"
+                      onPress={() => {
+                          Linking.openURL(`whatsapp://send?text=${this.state.shift}`);
+                      }}
+                    />
+                </CardSection>
+
+                <CardSection>
+                    <Button
+                      title="Fire Employee"
+                      onPress={() => this.setState({ showModal: true })}
                     />
                 </CardSection>
 
                 <Confirm
                     visible={this.state.showModal}
-                    onAccept={this.onAccept.bind(this)}
-                    onDecline={this.onDecline.bind(this)}
+                    onAccept={() => {
+                        const { uid } = this.props.employee;
+                        this.props.employeeDelete({ uid });
+                    }}
+                    onDecline={() => this.setState({ showModal: !this.state.showModal })}
                 >
-                    Are you sure you want to delete this?
+                    Fire??
                 </Confirm>
+
             </Card>
         );
     }
 }
 
-const mapStateToProps = (state) => {
-    const { name, phone, shift } = state.employeeForm;
-    return { name, phone, shift };
+const styles = {
+  pickerText: {
+      fontSize: 18,
+      paddingLeft: 20,
+  }
 };
 
-export default connect(mapStateToProps, {
-    employeeUpdate,
-    employeeSave,
-    employeeDelete
-})(EmployeeEdit);
+export default connect(null, {employeeSave, employeeDelete})(EmployeeEdit);

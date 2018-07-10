@@ -1,10 +1,10 @@
-import React from 'react';
-import { Text, View, Modal } from 'react-native';
-import { CardSection } from './CardSection';
+import React, { Component } from 'react';
+import { View, Text, Modal } from 'react-native';
 import { Button } from './Button';
+import { CardSection } from './CardSection';
 
 const Confirm = ({ children, visible, onAccept, onDecline }) => {
-    const { containerStyle, textStyle, CardSectionStyle } = styles;
+    const { cardSectionStyle, textStyle, containerStyle } = styles;
 
     return (
         <Modal
@@ -14,24 +14,25 @@ const Confirm = ({ children, visible, onAccept, onDecline }) => {
             onRequestClose={() => {}}
         >
             <View style={containerStyle}>
-                <CardSection style={CardSectionStyle}>
-                    <Text style={textStyle}>{children}</Text>
-                </CardSection>
-                
-                <CardSection>
-                    <Button
-                        onPress={onAccept}
-                        title="Yes, Fire."
-                    />
-                </CardSection>
+            <CardSection style={cardSectionStyle}>
+                <Text style={textStyle}>{children}</Text>
+            </CardSection>
 
-                <CardSection>
-                    <Button
-                        onPress={onDecline}
-                        title="no"
-                    />
-                </CardSection>
+            <CardSection>
+                <Button
+                    onPress={onAccept}
+                    title="Yes"
+                />
+            </CardSection>
+
+            <CardSection>
+            <Button
+                onPress={onDecline}
+                title="No"
+            />
+            </CardSection>
             </View>
+
         </Modal>
     );
 };
@@ -47,11 +48,11 @@ const styles = {
         lineHeight: 40
     },
     containerStyle: {
-        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        backgroundColor: 'rgba(0,0,0,0.75)',
         position: 'relative',
         flex: 1,
         justifyContent: 'center'
-    },
-};
+    }
+}
 
 export { Confirm };

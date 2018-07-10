@@ -1,14 +1,15 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
-import { ListView } from 'react-native';
+import { Text, View, ListView } from 'react-native';
 import { connect } from 'react-redux';
-import { employeesFetch } from '../actions';
+import { CardSection } from './common';
+import { employeeFetch } from '../actions';
 import ListItem from './ListItem';
 
 class EmployeeList extends Component {
     componentWillMount() {
-        this.props.employeesFetch();
-        this.createDataSource(this.props);        
+        this.props.employeeFetch();
+        this.createDataSource(this.props);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -39,11 +40,13 @@ class EmployeeList extends Component {
 }
 
 const mapStateToProps = state => {
-    const employees = _.map(state.employees, (val, uid) => {
-        return { ...val, uid };
+    const employees = _.map(state.employees, (val,uid) => {
+        return { ...val, uid }
     });
 
     return { employees };
-};
+}
 
-export default connect(mapStateToProps, { employeesFetch })(EmployeeList);
+export default connect(mapStateToProps, {
+    employeeFetch
+})(EmployeeList);
